@@ -1,5 +1,5 @@
 import type { UserMarketItem } from './type'
-import { PropType, StorageStatus } from './type'
+import {  StorageStatus } from './type'
 
 export const html = {
     botId: '',
@@ -179,7 +179,7 @@ export const html = {
             return `<tr>
                     <td>${item.id}</td>
                     <td>${item.name}${item.pic ? `<img class="props" src="${item.pic}"/>` : ''}</td>
-                    <td>${PropType[item.type]}</td>
+                    <td>${item.type}</td>
                     <td>${item.total}</td>
                     <td>
                         <img src="http://q.qlogo.cn/qqapp/${this.botId}/${item.userId}/640"
@@ -369,7 +369,7 @@ export const html = {
             <div class="info-item"><span class="info-label">单价:</span><span id="price">${marketInfo.price} ${this.currencyName} ${undulate}</div>
             <div class="info-item"><span class="info-label">上架时间:</span> <span class="time">${uilts.formatTimestamp(marketInfo.time)} ${uilts.countdown(marketInfo.time)}</span></div>
             <div class="info-item"><span class="info-label">商品状态:</span> <span id="status" class="status">${StorageStatus[marketInfo.status]}</span></div>
-            <div class="info-item"><span class="info-label">商品类型:</span> <span id="type">${PropType[marketInfo.type]}</span></div>
+            <div class="info-item"><span class="info-label">商品类型:</span> <span id="type">${marketInfo.type}</span></div>
         </div>
         ${marketInfo.pic ? `
             <div class="product-image-box">
