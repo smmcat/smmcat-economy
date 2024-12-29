@@ -84,6 +84,7 @@ export function apply(ctx: Context, config: Config) {
         type: 0,
         isSell: true
       }
+      // 调用上传商品方法
       await ctx.economy.sellMarketSomeItem(session, upValue)
       await session.send('上架完成...')
     })
@@ -91,6 +92,7 @@ export function apply(ctx: Context, config: Config) {
   ctx
     .command('店铺回收')
     .action(async ({ session }) => {
+      // 获取并操作商品回收数据
       ctx.economy.recycleProduct(session, 'ceshi', async (event: Economy_DelistData) => {
         console.log(event.upValue);
         // 操作数据退回到用户仓库 ↓
@@ -99,5 +101,15 @@ export function apply(ctx: Context, config: Config) {
         event.isRecycle = true
       })
     })
+
+  // 监听商品回收事件
+  ctx.economy.on('recycle', async (event: Economy_EventData<Economy_RecycleData>) => {
+    event.upValue.forEach((item) => {
+      // 操作每个数据退回到用户仓库
+      // 巴拉巴拉巴拉 操作完成
+    })
+    // 操作完成后，通知服务
+    event.isOver = true
+  }, 'ceshi')
 }
 ```

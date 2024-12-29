@@ -29,6 +29,7 @@ export interface Economy_EventData<T> {
     session: Session;
     by: string;
     upValue: T;
+    isOver?: boolean
 }
 
 export interface Economy_DelistData {
@@ -74,6 +75,13 @@ export type SellingUpData = {
     /** 是否完成配置 */
     isSell: boolean
 }
+
+export type Economy_RecycleData = {
+    total: number,
+    price: number,
+    by: string,
+    name: string
+}[]
 
 /** 商品清单 */
 export type UserMarketItem = {

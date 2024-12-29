@@ -136,6 +136,12 @@ class EconomyClass extends Service {
       .action(async ({ session }) => {
         this.getEarnings(session)
       })
+
+    ctx
+      .command('商店/商品回收')
+      .action(async ({ session }) => {
+        this.setrecycleProductEvent(session)
+      })
   }
   /** 接收事件 */
   public on(event: string, callback: Function, by = 'all'): void {
@@ -149,7 +155,7 @@ class EconomyClass extends Service {
     this.events[event].push(temp);
   }
   /** 触发事件 */
-  public async emit<T>(event: string, eventData?: { session: Session, by: string, upValue: T }): Promise<void> {
+  public async emit<T>(event: string, eventData?: { session: Session, by: string, upValue: T, isOver?: boolean }): Promise<void | boolean> {
     if (this.events[event]) {
       await Promise.all(this.events[event].map(_event => {
         console.log(eventData.by);
@@ -319,7 +325,7 @@ class EconomyClass extends Service {
     return allMarket
   }
   /** 获取收益信息 */
-  private async getEarnings(session) {
+  private async getEarnings(session: Session) {
     const userId = session.userId
     const res = this.accountList[userId]
     if (res.earnings == 0 && Object.keys(res.logs).length) {
@@ -329,6 +335,48 @@ class EconomyClass extends Service {
       return `[${item}] x${res.logs[item]}`
     }).join('\n')
     await session.send(h.at(session.userId) + msg)
+  }
+  /** 发送商品回收事件 */
+  private async setrecycleProductEvent(session: Session) {
+    this.updateMarket()
+    const userId = session.userId
+    if (!this.events['recycle']) {
+      session.send('未绑定任何接收事件方，回收商品失败')
+      return
+    }
+    const temp = {}
+    const markTemp = {}
+    const eventKey = [...new Set(Object.keys(this.events['recycle']).map((item) => this.events['recycle'][item].by))]
+    // 监听绑定的事件
+    const eventList = eventKey.map((item) => {
+      return new Promise(async (resolve) => {
+        const filterList = this.marketList[userId].filter((i) => i.by === item)
+        const recycleList = filterList.filter((i) => i.status === StorageStatus.已下架)
+        markTemp[item] = recycleList
+        /** 推送内容 */
+        const upValue = recycleList.map((item) => {
+          return {
+            total: item.total,
+            price: item.price,
+            by: item.by,
+            name: item.name
+          }
+        })
+        const eventData = { session, upValue, by: item, isOver: false }
+        await this.emit('recycle', eventData)
+        console.log(eventData.isOver);
+        eventData.isOver ? (temp[item] = true) : (temp[item] = false)
+        resolve(true)
+      })
+    })
+
+    await Promise.all(eventList)
+    const msg = Object.keys(temp).map((by) => {
+      this.marketList[userId] = this.marketList[userId].filter((item) => !(item.status === StorageStatus.已下架 && item.by === by))
+      return temp[by] ? `委派 ${by} 的操作完成回调` : ''
+    }).join('\n')
+    this.updateUserMarketStore(userId)
+    await session.send(msg)
   }
   /** 商品回收 */
   public async recycleProduct(session: Session, by: string, callback: (upValue: Economy_DelistData) => Promise<void> | void) {
@@ -348,7 +396,7 @@ class EconomyClass extends Service {
         name: item.name
       }
     })
- 
+
     const temp = { upValue, isRecycle: false }
     await callback(temp)
     if (temp.isRecycle) {
