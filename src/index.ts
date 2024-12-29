@@ -115,7 +115,7 @@ class EconomyClass extends Service {
       })
 
     ctx
-      .command('商店/商店购买 <shopId:number> <quantity:number>')
+      .command('商店/商店购买 <shopId:number> <quantity:number>').userFields(['id','name','permissions'])
       .action(async ({ session }, shopId, quantity = 1) => {
         if ((quantity = Math.floor(quantity)) < 1 && (shopId = Math.floor(shopId)) < 1) {
           await session.send('店铺id有误或者选购的数量小于1')
@@ -132,13 +132,13 @@ class EconomyClass extends Service {
       })
 
     ctx
-      .command('商店/收益统计')
+      .command('商店/收益统计').userFields(['id','name','permissions'])
       .action(async ({ session }) => {
         this.getEarnings(session)
       })
 
     ctx
-      .command('商店/商品回收')
+      .command('商店/商品回收').userFields(['id','name','permissions'])
       .action(async ({ session }) => {
         this.setrecycleProductEvent(session)
       })
@@ -419,6 +419,7 @@ class EconomyClass extends Service {
       price: item.price,
       total: item.price * quantity,
       by: item.by,
+      userId: item.userId,
       /** 操作完成后,请改为 true */
       isBuy: false
     }

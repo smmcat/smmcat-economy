@@ -16,15 +16,6 @@ export enum LogStatus {
     卖出 = 3
 }
 
-/** 商品类型 */
-// export enum PropType {
-//     丹药 = 0,
-//     药材 = 1,
-//     装备 = 2,
-//     功法 = 3,
-//     神通 = 4
-// }
-
 export interface Economy_EventData<T> {
     session: Session;
     by: string;
@@ -49,6 +40,8 @@ export type Economy_BuyEventData = {
     name: string,
     /** 购买数量 */
     quantity: number,
+    /** 卖家标识 */
+    userId: string,
     /** 商品单价 */
     price: number,
     /** 商品总价 */
@@ -71,7 +64,7 @@ export type SellingUpData = {
     /** 物品来源 */
     by: string,
     /** 物品类型 */
-    type: number,
+    type: string,
     /** 是否完成配置 */
     isSell: boolean
 }
