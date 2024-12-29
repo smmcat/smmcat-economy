@@ -18,7 +18,8 @@ export interface Config {
   sellAwaitTime: number
   shelfLifeTime: number
   pageLength: number
-  currencyName: string
+  currencyName: string,
+  logLen: number
 }
 
 export const usage = `
@@ -56,7 +57,8 @@ export const Config: Schema<Config> = Schema.object({
   sellAwaitTime: Schema.number().default(60000).description('上架延迟时间(ms)'),
   shelfLifeTime: Schema.number().default(259200000).description('上架持续时间(一天为 86400000ms),超时自动下架'),
   pageLength: Schema.number().default(10).description('每页显示数量'),
-  currencyName: Schema.string().default('灵石').description('货币名字')
+  currencyName: Schema.string().default('灵石').description('货币名字'),
+  logLen: Schema.number().default(10).description('日志长度')
 })
 
 declare module 'koishi' {
@@ -115,7 +117,7 @@ class EconomyClass extends Service {
       })
 
     ctx
-      .command('商店/商店购买 <shopId:number> <quantity:number>').userFields(['id','name','permissions'])
+      .command('商店/商店购买 <shopId:number> <quantity:number>').userFields(['id', 'name', 'permissions'])
       .action(async ({ session }, shopId, quantity = 1) => {
         if ((quantity = Math.floor(quantity)) < 1 && (shopId = Math.floor(shopId)) < 1) {
           await session.send('店铺id有误或者选购的数量小于1')
@@ -259,7 +261,8 @@ class EconomyClass extends Service {
     if (!this.userLogList[session.userId]) {
       this.userLogList[session.userId] = []
     }
-    const msg = this.userLogList[session.userId].map((item: logsItem) => {
+
+    const msg = this.userLogList[session.userId].reverse().slice(0, this.config.logLen).map((item: logsItem) => {
       return `${new Date(item.time).toLocaleString('zh-CN')}\n` +
         `操作：${LogStatus[item.type]}\n` +
         `目标：${item.name}\n` +
@@ -407,7 +410,7 @@ class EconomyClass extends Service {
     }
   }
   /** 购买商店中的某个商品 */
-  private async buyMarketSomeItem(item: UserMarketItem, session: Session<'id'|'name'|'permissions'>, quantity: number) {
+  private async buyMarketSomeItem(item: UserMarketItem, session: Session<'id' | 'name' | 'permissions'>, quantity: number) {
     if (quantity > item.total) {
       await session.send('购买数量大于店铺目前存在数量.购买失败...')
       return
@@ -419,7 +422,7 @@ class EconomyClass extends Service {
       price: item.price,
       total: item.price * quantity,
       by: item.by,
-      uid:item.uid,
+      uid: item.uid,
       userId: item.userId,
       /** 操作完成后,请改为 true */
       isBuy: false
@@ -448,6 +451,7 @@ class EconomyClass extends Service {
     this.accountList[item.userId].earnings += item.price * quantity
     this.accountList[item.userId].logs[item.name] += quantity
     this.updateAccountStore(item.userId)
+    this.updateUserMarketStore(item.userId)
 
     /** 记录日志 */
     const logTemp: logsItem = {

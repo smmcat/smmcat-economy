@@ -1,7 +1,7 @@
 {
   "name": "koishi-plugin-smmcat-economy",
   "description": "通用道具交易市场",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [

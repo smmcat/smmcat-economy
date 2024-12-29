@@ -17,19 +17,28 @@ export enum LogStatus {
 }
 
 export interface Economy_EventData<T> {
-    session: Session;
+    /** 消息会话 */
+    session: Session<'id'>;
+    /** 委派标识 该购买事件会传给对应设置标识的插件 */
     by: string;
+    /** 商品数据载荷 */
     upValue: T;
+    /** 是否完成 */
     isOver?: boolean
 }
 
 export interface Economy_DelistData {
     upValue: {
+        /** 回收的数量 */
         total: number,
+        /** 商品单价 */
         price: number,
+        /** 委派标识 该购买事件会传给对应设置标识的插件 */
         by: string,
+        /** 商品名 */
         name: string
     }[],
+    /** 是否回收 */
     isRecycle: boolean
 }
 
@@ -47,7 +56,7 @@ export type Economy_BuyEventData = {
     /** 商品总价 */
     total: number,
     /** 用户数据库 uid */
-    uid: number,
+    uid?: number,
     /** 委派标识 该购买事件会传给对应设置标识的插件 */
     by: string,
     /** 操作完成后,请改为 true */
@@ -74,9 +83,13 @@ export type SellingUpData = {
 }
 
 export type Economy_RecycleData = {
+    /** 回收的数量 */
     total: number,
+    /** 商品单价 */
     price: number,
+    /** 委派标识 该购买事件会传给对应设置标识的插件 */
     by: string,
+    /** 商品名 */
     name: string
 }[]
 
