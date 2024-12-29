@@ -132,13 +132,13 @@ class EconomyClass extends Service {
       })
 
     ctx
-      .command('商店/收益统计').userFields(['id','name','permissions'])
+      .command('商店/收益统计')
       .action(async ({ session }) => {
         this.getEarnings(session)
       })
 
     ctx
-      .command('商店/商品回收').userFields(['id','name','permissions'])
+      .command('商店/商品回收')
       .action(async ({ session }) => {
         this.setrecycleProductEvent(session)
       })
@@ -407,7 +407,7 @@ class EconomyClass extends Service {
     }
   }
   /** 购买商店中的某个商品 */
-  private async buyMarketSomeItem(item: UserMarketItem, session: Session, quantity: number) {
+  private async buyMarketSomeItem(item: UserMarketItem, session: Session<'id'|'name'|'permissions'>, quantity: number) {
     if (quantity > item.total) {
       await session.send('购买数量大于店铺目前存在数量.购买失败...')
       return
