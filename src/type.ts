@@ -46,6 +46,8 @@ export type Economy_BuyEventData = {
     price: number,
     /** 商品总价 */
     total: number,
+    /** 用户数据库 uid */
+    uid: number,
     /** 委派标识 该购买事件会传给对应设置标识的插件 */
     by: string,
     /** 操作完成后,请改为 true */
@@ -65,6 +67,8 @@ export type SellingUpData = {
     by: string,
     /** 物品类型 */
     type: string,
+    /** 用户数据库 uid */
+    uid?: number
     /** 是否完成配置 */
     isSell: boolean
 }
@@ -90,6 +94,8 @@ export type UserMarketItem = {
     name: string,
     /** 商品总数 */
     total: number,
+    /** 用户数据库 uid */
+    uid?: number,
     /** 商品单价 */
     price: number,
     /** 上架时间 */

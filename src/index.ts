@@ -419,6 +419,7 @@ class EconomyClass extends Service {
       price: item.price,
       total: item.price * quantity,
       by: item.by,
+      uid:item.uid,
       userId: item.userId,
       /** 操作完成后,请改为 true */
       isBuy: false
